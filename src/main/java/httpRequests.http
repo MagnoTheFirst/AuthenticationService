@@ -1,0 +1,14 @@
+POST http://localhost:8082/api/v1/registration
+Content-Type: application/json
+
+{
+  "firstname": "alejandro",
+  "lastname" : "laneri",
+  "email":"al@gmail.com",
+  "password": "Test12345-"
+}
+
+
+###
+
+GET http://localhost:8081/api/v1/users
