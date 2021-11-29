@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor  //Durch diese Lombok annotation wird der COntructor automatisch generiert
 public class AppUserService implements UserDetailsService {
@@ -25,21 +27,25 @@ public class AppUserService implements UserDetailsService {
     }
 
     public String signUpUser(AppUser appUser){
-        boolean userExists = appUserRepository.findByEmail(appUser.getEmail())
-                .isPresent();
+        boolean userExists = appUserRepository.findByEmail(appUser.getEmail()).isPresent();
         if(userExists){
-            throw new IllegalStateException("Diese email ist bereits registriert");
+            throw new IllegalStateException("Email already taken");
         }
-
         String encodedPassword = bCryptPasswordEncoder.encode(appUser.getPassword());
-
         appUser.setPassword(encodedPassword);
 
-        appUserRepository.sa
+        appUserRepository.save(appUser);
+        String token = UUID.randomUUID().toString();
 
-        //TODO: Send confirmation token
+        ConfirmationToken confirmationToken = new ConfirmationToken(token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15),
+                appUser
+        );
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
 
-        return "it works";
+        //TODO: Send Email
+        return token;
     }
 
 }
